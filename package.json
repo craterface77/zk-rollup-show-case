@@ -1,0 +1,20 @@
+{
+  "name": "hardhat-project",
+  "scripts": {
+    "compile": "npm run zkit-make && npm run zkit-verifiers && npm run solidity-compile",
+    "solidity-compile": "npx hardhat compile --force",
+    "zkit-make": "npx hardhat zkit make",
+    "zkit-compile": "npx hardhat zkit compile",
+    "zkit-verifiers": "npx hardhat zkit verifiers"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.19"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@solarity/chai-zkit": "^0.3.0",
+    "@solarity/hardhat-zkit": "^0.5.12",
+    "circomlib": "^2.0.5"
+  }
+}
