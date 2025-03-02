@@ -1,6 +1,6 @@
 pragma circom 2.1.9;
 
-include "../node_modules/circomlib/circuits/mimcsponge.circom";
+include "../node_modules/circomlib/circuits/poseidon.circom";
 
 // if s == 0 returns [in[0], in[1]]
 // if s == 1 returns [in[1], in[0]]
@@ -24,17 +24,16 @@ template GetMerkleRoot(k) { // k is depth of tree
     component selectors[k];
     component hashers[k];
 
-    for(var i = 0; i < k; i++){
+    for (var i = 0; i < k; i++) {
         selectors[i] = DualMux();
-        selectors[i].in[0] <== i == 0 ? leaf : hashers[i - 1].outs[0];
+        selectors[i].in[0] <== i == 0 ? leaf : hashers[i - 1].out;
         selectors[i].in[1] <== proof_elements[i];
         selectors[i].s <== proof_positions[i];
 
-        hashers[i] = MiMCSponge(2, 220, 1);
-        hashers[i].ins[0] <== selectors[i].out[0];
-        hashers[i].ins[1] <== selectors[i].out[1];
-        hashers[i].k <== 1;
+        hashers[i] = Poseidon(2);
+        hashers[i].inputs[0] <== selectors[i].out[0];
+        hashers[i].inputs[1] <== selectors[i].out[1];
     }
 
-    root <== hashers[k-1].outs[0];
+    root <== hashers[k - 1].out;
 }
