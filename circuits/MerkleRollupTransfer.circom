@@ -1,4 +1,4 @@
-pragma circom 2.2.0;
+pragma circom 2.1.9;
 
 include "../node_modules/circomlib/circuits/mimcsponge.circom";
 include "../node_modules/circomlib/circuits/eddsamimc.circom";
@@ -98,3 +98,5 @@ template MerkleRollupTransfer(k) { // k is the depth of accounts tree
     // Return final root
     new_root <== compute_final_root.root;
 }
+
+component main = MerkleRollupTransfer(2);

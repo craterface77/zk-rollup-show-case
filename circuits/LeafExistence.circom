@@ -1,9 +1,9 @@
-pragma circom 2.2.0;
+pragma circom 2.1.9;
 
 include "../node_modules/circomlib/circuits/mimcsponge.circom";
 include "./GetMerkleRoot.circom";
 
-template LeafExistence(k, l) { // l - user state, k - tree hight
+template LeafExistence(l, k) { // l - user state, k - tree hight
     signal input root;
     signal input data[l];
     signal input proof_elements[k], proof_positions[k];

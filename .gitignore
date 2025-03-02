@@ -5,6 +5,8 @@ node_modules
 # Hardhat files
 /cache
 /artifacts
+/generated-types
+/zkit
 
 # TypeChain files
 /typechain

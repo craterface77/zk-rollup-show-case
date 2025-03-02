@@ -6,5 +6,9 @@
 import * as Circuits from ".";
 
 declare module "hardhat/types/runtime" {
-  interface HardhatZKit {}
+  interface HardhatZKit {
+    getCircuit(
+      name: "MerkleRollupTransfer",
+    ): Promise<Circuits.MerkleRollupTransfer>;
+  }
 }

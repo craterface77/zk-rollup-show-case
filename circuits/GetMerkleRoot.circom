@@ -1,42 +1,40 @@
-pragma circom 2.2.0;
+pragma circom 2.1.9;
 
-template GetMerkleRoot(k) {
+include "../node_modules/circomlib/circuits/mimcsponge.circom";
+
+// if s == 0 returns [in[0], in[1]]
+// if s == 1 returns [in[1], in[0]]
+template DualMux() {
+    signal input in[2];
+    signal input s;
+    signal output out[2];
+
+    s * (s - 1) === 0;
+
+    out[0] <== (in[1] - in[0]) * s + in[0];
+    out[1] <== (in[0] - in[1]) * s + in[1];
+}
+
+template GetMerkleRoot(k) { // k is depth of tree
     signal input leaf;
     signal input proof_elements[k], proof_positions[k];
 
-    signal left, right;
-    signal current <== leaf;
+    signal output root;
 
-    signal root; // returns root hash
+    component selectors[k];
+    component hashers[k];
 
-    component hashes[k];
+    for(var i = 0; i < k; i++){
+        selectors[i] = DualMux();
+        selectors[i].in[0] <== i == 0 ? leaf : hashers[i - 1].outs[0];
+        selectors[i].in[1] <== proof_elements[i];
+        selectors[i].s <== proof_positions[i];
 
-    for (var i = 0; i < k; i++) {
-        /*
-        Example:
-            current=42
-            proof_elements[i]=100
-
-            @if proof_positions[i]=0:
-
-            left= 0 * 100 + (1 - 0) * 42 = 0 + 1 * 42 = 42
-            right= 0 * 42 + (1 - 0) * 100 = 0 + 1 * 100 = 100
-
-            @if proof_positions[i]=1:
-
-            left= 1 * 100 + (1 - 1) * 42 = 1 * 100 + 0 = 100
-            right= 1 * 42 + (1 - 1) * 100 = 1 * 42 + 0 = 42
-        */
-        left <-- proof_positions[i] * proof_elements[i] + (1 - proof_positions[i]) * current;
-        right <-- proof_positions[i] * current + (1 - proof_positions[i]) * proof_elements[i];
-
-        hashes[i] = MiMCSponge(2, 220, 1);
-        hashes[i].ins[0] <== left;
-        hashes[i].ins[1] <== right;
-        hashes[i].k <== 1;
-
-        current <== hashes[i].outs[0];
+        hashers[i] = MiMCSponge(2, 220, 1);
+        hashers[i].ins[0] <== selectors[i].out[0];
+        hashers[i].ins[1] <== selectors[i].out[1];
+        hashers[i].k <== 1;
     }
 
-    root <== current;
+    root <== hashers[k-1].outs[0];
 }
